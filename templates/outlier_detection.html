@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Find Unusual Data - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Find Unusual Data (Range Check Method)</h2>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">
+            <p><strong>Error:</strong> {{ error }}</p>
+            <p>Please make sure the data is loaded and prepared correctly. You might need to <a href="{{ url_for('load_data_route') }}">load the data file</a> and <a href="{{ url_for('preprocessing_route') }}">prepare the data</a> again.</p>
+        </div>
+    {% elif plot_url and outliers_summary is defined %}
+        <div class="alert alert-info mt-3">
+            Unusual data points identified using the Range Check method (based on 1.5 times the middle range of data).
+        </div>
+
+        <h4 class="mt-4">Box Pictures for Number-Based Readings</h4>
+        <p>The box pictures below show how spread out the data is and help spot unusual points for each type of number-based reading in the daily summaries.</p>
+        <div class="text-center mb-4">
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Box Pictures for Finding Unusual Data" class="img-fluid" style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+        </div>
+
+        <h4 class="mt-4">Summary of Unusual Data</h4>
+        {% if outliers_summary %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th>Type of Reading</th>
+                            <th>Number of Unusual Low Points</th>
+                            <th>Number of Unusual High Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for var, counts in outliers_summary.items() %}
+                        <tr>
+                            <td>{{ var }}</td>
+                            <td>{{ counts.low }}</td>
+                            <td>{{ counts.high }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No unusual data points found, or the summary is not available.</p>
+        {% endif %}
+         <div class="mt-4">
+            <a href="{{ url_for('correlation_analysis_route') }}" class="btn btn-primary">Next: See Relationships in Data</a>
+        </div>
+    {% else %}
+        <div class="alert alert-warning mt-3">
+            {{ message | default('No unusual data to show. Please make sure data is loaded and prepared.') }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

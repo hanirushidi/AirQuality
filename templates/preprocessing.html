@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Prepare Data - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Prepare Your Data for Study</h2>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">
+            <p><strong>Error:</strong> {{ error }}</p>
+            {% if "load data first" in error|lower %}
+                 <p>Please go to the <a href="{{ url_for('load_data_route') }}">Load Data File</a> page first.</p>
+            {% endif %}
+        </div>
+    {% elif message %}
+        <div class="alert alert-success mt-3">{{ message }}</div>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            Click the button below to clean and organize your loaded air data. This includes handling missing values and summarizing data by day.
+        </div>
+    {% endif %}
+
+    {% if not error and not message %}
+    <form method="GET" action="{{ url_for('preprocessing_route') }}">
+        {# This form is a bit redundant if the action is just a GET to the same page to trigger processing.
+           Typically, preprocessing might be triggered by a POST or directly on page load if data is present.
+           For simplicity, let's assume clicking a button (or just visiting the page if data is loaded) triggers it.
+           If a button is desired:
+        #}
+         <a href="{{ url_for('preprocessing_route') }}" class="btn btn-primary mt-3">Start Preparing Data</a>
+    </form>
+    {% endif %}
+
+    {% if hourly_preview and daily_preview %}
+        <h4 class="mt-4">Quick Look: Prepared Hourly Data (First 10 Rows)</h4>
+        <div class="table-responsive">
+            {{ hourly_preview | safe }}
+        </div>
+
+        <h4 class="mt-4">Quick Look: Prepared Daily Summary Data (First 10 Rows)</h4>
+        <div class="table-responsive">
+            {{ daily_preview | safe }}
+        </div>
+        <div class="mt-4">
+            <a href="{{ url_for('trend_analysis_route') }}" class="btn btn-primary">Next: View Trends</a>
+        </div>
+    {% elif session.get('data_preprocessed') and not error %}
+         <div class="alert alert-info mt-3">
+            Data has already been prepared. You can proceed to <a href="{{ url_for('trend_analysis_route') }}">View Trends</a>.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

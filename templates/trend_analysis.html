@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}View Trends - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Look at Changes Over Time (Trends)</h2>
+
+    {% if error %}
+      <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% elif not session.get('data_preprocessed') %}
+      <div class="alert alert-warning mt-3">
+        Please prepare the data first on the <a href="{{ url_for('preprocessing_route') }}">Prepare Data</a> page.
+      </div>
+    {% else %}
+      <div class="alert alert-info mt-3">
+        {{ message | default('This section is for showing how air readings change over time.') }}
+      </div>
+      <p class="mt-3">
+        Here you will see graphs showing how different air readings (like CO, NOx) change from day to day.
+        You'll be able to choose different types of air readings to see their trends.
+      </p>
+      
+      {% if data_preview %}
+        <h4 class="mt-3">Quick Look: Daily Summary Data (First 10 Rows)</h4>
+        <p>This is the data used for finding trends:</p>
+        <div class="table-responsive">
+            {{ data_preview | safe }}
+        </div>
+      {% endif %}
+
+      <!-- Placeholder for pollutant/variable selection and plots -->
+      <div id="plot-area" class="mt-4" style="min-height: 200px; border: 1px dashed #ccc; padding: 10px;">
+          <p>Graphs showing trends will appear here once you select an air reading type.</p>
+          <!-- Plots will be rendered here by JavaScript later -->
+      </div>
+
+      <div class="mt-4">
+        <a href="{{ url_for('outlier_detection_route') }}" class="btn btn-primary">Next: Find Unusual Data</a>
+      </div>
+    {% endif %}
+</div>
+{% endblock %}

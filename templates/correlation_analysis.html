@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}See Relationships in Data - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>See Relationships in Data</h2>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">
+            <p><strong>Error:</strong> {{ error }}</p>
+            <p>Please make sure the data is loaded and prepared correctly. You might need to <a href="{{ url_for('load_data_route') }}">load the data file</a> and <a href="{{ url_for('preprocessing_route') }}">prepare the data</a> again.</p>
+        </div>
+    {% elif plot_url and corr_matrix_html %}
+        <div class="alert alert-info mt-3">
+            Table and color map showing how different daily air readings relate to each other.
+        </div>
+
+        <h4 class="mt-4">Color Map of Relationships</h4>
+        <div class="text-center mb-4">
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Color Map of Data Relationships" class="img-fluid" style="max-width: 800px; height: auto; border: 1px solid #ddd;">
+        </div>
+
+        <h4 class="mt-4">Table of Relationships</h4>
+        <div class="table-responsive">
+            {{ corr_matrix_html | safe }}
+        </div>
+    {% else %}
+        <div class="alert alert-warning mt-3">
+            {{ message | default('No relationship data to show. Please make sure data is loaded and prepared.') }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

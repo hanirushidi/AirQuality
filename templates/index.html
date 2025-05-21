@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Home - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to the Air Data Study Project!</h1>
+    <p class="lead">This tool helps you look at and understand air data.</p>
+    <hr class="my-4">
+    <p>You can load your data, prepare it, find trends, spot unusual readings, see how different readings relate, group similar data points, and get a summary report.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('load_data_route') }}" role="button">Get Started: Load Data File</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h4>1. Load Data File</h4>
+        <p>Start by loading your air data file (e.g., a CSV file).</p>
+    </div>
+    <div class="col-md-4">
+        <h4>2. Prepare Data</h4>
+        <p>Clean and organize your data to get it ready for study.</p>
+    </div>
+    <div class="col-md-4">
+        <h4>3. Study Your Data</h4>
+        <p>Explore trends, find unusual points, see relationships, and group your data.</p>
+    </div>
+</div>
+{% endblock %}

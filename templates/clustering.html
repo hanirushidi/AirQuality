@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Grouping Similar Data - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Finding Patterns: Grouping Data (K-Means Method)</h2>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">
+            <p><strong>Error:</strong> {{ error }}</p>
+            <p>Please make sure the data is loaded and prepared correctly. You might need to <a href="{{ url_for('load_data_route') }}">load the data file</a> and <a href="{{ url_for('preprocessing_route') }}">prepare the data</a> again.</p>
+        </div>
+    {% elif plot_url or cluster_summary_html %}
+        <div class="alert alert-info mt-3">
+            Data grouping applied to daily summaries of number-based air readings. Number of groups found: {{ num_clusters_used | default('N/A') }}.
+            {% if plot_url %}
+            The picture of the groups uses the Main Factors (PCA Method) to show them.
+            {% else %}
+            The picture of the groups could not be made (for example, if there are less than 2 types of measurements to compare).
+            {% endif %}
+        </div>
+
+        {% if plot_url %}
+        <h4 class="mt-4">Picture of Groups (based on Main Factors)</h4>
+        <div class="text-center mb-4">
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Graph of Grouped Data (using Main Factors)" class="img-fluid" style="max-width: 800px; height: auto; border: 1px solid #ddd;">
+        </div>
+        {% endif %}
+
+        {% if cluster_summary_html %}
+        <h4 class="mt-4">Summary of Groups</h4>
+        <p>How many items are in each group:</p>
+        <div class="table-responsive">
+            {{ cluster_summary_html | safe }}
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-warning mt-3">
+            {{ message | default('No grouping data to show. Please make sure data is loaded and prepared.') }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

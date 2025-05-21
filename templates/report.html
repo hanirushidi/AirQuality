@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Get Report - Air Data Study{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Summary Report</h2>
+
+    {% if error %}
+      <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% else %}
+      <div class="alert alert-info mt-3">
+        {{ message | default('Choose a format and click "Create Report" to get a summary of your data.') }}
+      </div>
+      
+      <div class="mb-4">
+        <h4>Choose Report Format:</h4>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="reportFormat" id="pdfFormat" value="pdf" checked>
+          <label class="form-check-label" for="pdfFormat">PDF Document</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="reportFormat" id="htmlFormat" value="html">
+          <label class="form-check-label" for="htmlFormat">Web Page (HTML)</label>
+        </div>
+      </div>
+
+      <div id="report-preview" class="border p-3 mb-4" style="min-height: 100px;">
+        <p>Your report will appear here after it's created.</p>
+      </div>
+
+      <button id="generate-report" class="btn btn-primary" onclick="generateReport()">Create Report</button>
+    {% endif %}
+</div>
+
+<script>
+function generateReport() {
+    const format = document.querySelector('input[name="reportFormat"]:checked').value;
+    const previewArea = document.getElementById('report-preview');
+    previewArea.innerHTML = '<p>Creating your report, please wait...</p>';
+
+    fetch('/generate_report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ format: format })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (format === 'pdf' && data.download_url) {
+                previewArea.innerHTML = `<p>Report created! <a href="${data.download_url}" target="_blank" download="air_data_report.pdf">Download PDF Report</a></p>`;
+                // Optionally trigger download automatically
+                // window.location.href = data.download_url;
+            } else if (format === 'html' && data.html_content) {
+                previewArea.innerHTML = data.html_content;
+                 // Add a download button for the HTML content
+                const downloadButton = document.createElement('a');
+                downloadButton.href = "{{ url_for('download_html') }}"; // Use the correct route name
+                downloadButton.className = 'btn btn-secondary mt-3';
+                downloadButton.innerText = 'Download HTML Report';
+                downloadButton.setAttribute('download', 'air_data_report.html');
+                previewArea.appendChild(document.createElement('br'));
+                previewArea.appendChild(downloadButton);
+
+            } else if (format === 'html' && data.download_url) { // For direct HTML download if implemented that way
+                 previewArea.innerHTML = `<p>Report created! <a href="${data.download_url}" target="_blank" download="air_data_report.html">Download HTML Report</a></p>`;
+            }
+            else {
+                previewArea.innerHTML = '<p>Report created, but there is no preview or download link available for this format.</p>';
+            }
+        } else {
+            previewArea.innerHTML = `<p style="color: red;">Error creating report: ${data.error || 'Unknown error'}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        previewArea.innerHTML = `<p style="color: red;">Could not create report. Check console for details.</p>`;
+    });
+}
+</script>
+{% endblock %}
