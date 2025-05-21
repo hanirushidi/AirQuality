@@ -7,3 +7,4 @@ seaborn
 plotly
 openpyxl # Required by pandas to read .xlsx, though we'll use CSV
 pdfkit # For PDF report generation
+gunicorn
